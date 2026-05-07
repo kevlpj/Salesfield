@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SalesField">
+<meta name="theme-color" content="#07090f">
+<title>SalesField</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#07090f;--s1:#0e1219;--s2:#141920;
+  --b1:rgba(255,255,255,0.08);--b2:rgba(255,255,255,0.14);
+  --a:#f59e0b;--ad:rgba(245,158,11,0.12);--ab:rgba(245,158,11,0.28);
+  --tx:#dde3ef;--mu:#4a5568;--m2:#2d3748;
+  --gn:#10b981;--rd:#ef4444;--bl:#818cf8;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;line-height:1.5;overflow-x:hidden}
+.hdr{background:rgba(7,9,15,.97);border-bottom:1px solid var(--b1);padding:14px 16px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.ht{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.brand sup{font-size:10px;color:var(--a);font-weight:700;letter-spacing:.12em;text-transform:uppercase;display:block}
+.brand h1{font-size:22px;font-weight:800;color:#f1f5f9;letter-spacing:-.02em}
+.hr{display:flex;align-items:center;gap:8px}
+.chip{background:var(--ad);border:1px solid var(--ab);border-radius:8px;padding:4px 10px;font-size:11px;color:var(--a)}
+.ibtn{background:var(--s2);border:1px solid var(--b2);border-radius:8px;color:var(--mu);cursor:pointer;font-size:16px;width:34px;height:34px;display:flex;align-items:center;justify-content:center}
+.tabs{display:flex}
+.tab{background:none;border:none;border-bottom:2.5px solid transparent;color:var(--mu);font-family:inherit;font-size:14px;font-weight:700;padding:10px 18px;cursor:pointer;transition:all .18s;white-space:nowrap}
+.tab.on{color:var(--a);border-bottom-color:var(--a)}
+.wrap{max-width:600px;margin:0 auto;padding:20px 16px 100px}
+.sett{display:none;background:var(--s1);border:1px solid var(--b2);border-radius:16px;padding:20px;margin-bottom:20px}
+.sett.open{display:block}
+.sett h3{font-size:11px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.09em;margin-bottom:14px}
+.krow{display:flex;gap:8px}
+.krow input{flex:1}
+.hint{font-size:12px;color:var(--mu);margin-top:8px;line-height:1.5}
+.hint a{color:var(--bl)}
+.field{margin-bottom:16px}
+label.lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mu);margin-bottom:7px}
+input[type=text],input[type=email],input[type=password],textarea{width:100%;background:var(--s1);border:1.5px solid var(--b2);border-radius:12px;color:var(--tx);font-family:inherit;font-size:15px;padding:12px 14px;outline:none;resize:vertical;-webkit-appearance:none;transition:border-color .18s,box-shadow .18s}
+input:focus,textarea:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(245,158,11,.12)}
+input::placeholder,textarea::placeholder{color:var(--m2)}
+.pills{display:flex;gap:8px;margin-bottom:6px}
+.pill{flex:1;background:var(--s1);border:1.5px solid var(--b2);border-radius:12px;color:var(--mu);cursor:pointer;font-family:monospace;font-size:16px;font-weight:700;padding:12px 4px;text-align:center;transition:all .18s;-webkit-appearance:none;touch-action:manipulation}
+.pill.on{background:var(--ad);border-color:var(--a);color:var(--a)}
+.tl{font-size:12px;color:var(--mu);font-style:italic;margin-top:4px}
+.cbox{background:var(--s1);border:1px solid var(--b1);border-radius:16px;padding:16px;margin-bottom:16px}
+.cbox-t{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--a);margin-bottom:14px}
+.mrow{display:flex;gap:8px;align-items:flex-start}
+.mrow input,.mrow textarea{flex:1}
+.mbtn{flex-shrink:0;width:48px;height:48px;border-radius:12px;border:1.5px solid var(--b2);background:var(--s2);color:var(--mu);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .18s;touch-action:manipulation;-webkit-appearance:none}
+.mbtn:active{transform:scale(.92)}
+.mbtn.rec{background:var(--a);border-color:var(--a);color:#000;animation:pulse 1.4s ease-in-out infinite}
+.mbtn.busy{background:var(--ad);border-color:var(--a);color:var(--a);cursor:default}
+.rbar{display:none;align-items:center;gap:8px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:9px;padding:8px 12px;font-size:12px;color:var(--a);margin-top:6px}
+.rbar.show{display:flex}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--a);animation:blink 1s step-end infinite;flex-shrink:0}
+.bnr{display:none;align-items:center;gap:10px;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:16px;line-height:1.5}
+.bnr.show{display:flex}
+.bnr.info{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);color:var(--bl)}
+.bnr.ok{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--gn)}
+.bnr.err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--rd)}
+.bnr.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--a)}
+.rfbar{background:linear-gradient(135deg,rgba(245,158,11,.09),rgba(245,158,11,.03));border:1px solid var(--ab);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.rfbar p{flex:1;font-size:13px;color:#94a3b8;line-height:1.5}
+.rfbar strong{color:var(--a)}
+.abtn{background:var(--a);border:none;border-radius:10px;color:#000;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;padding:11px 18px;flex-shrink:0;min-width:90px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .18s;-webkit-appearance:none;touch-action:manipulation}
+.abtn:disabled{background:var(--m2);color:var(--mu);cursor:not-allowed}
+.abtn:active:not(:disabled){transform:scale(.96)}
+.rfbox{background:var(--s2);border:1px solid rgba(16,185,129,.25);border-radius:14px;margin-bottom:16px;overflow:hidden;display:none}
+.rfbox header{background:rgba(16,185,129,.1);border-bottom:1px solid rgba(16,185,129,.15);padding:10px 14px;font-size:11px;font-weight:700;color:var(--gn);letter-spacing:.08em;text-transform:uppercase}
+.rfbox pre{padding:14px;font-family:'Courier New',monospace;font-size:13px;line-height:1.8;color:#94a3b8;white-space:pre-wrap;word-break:break-word}
+.savebtn{width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:14px;color:#000;font-family:inherit;font-size:17px;font-weight:800;padding:17px;cursor:pointer;transition:all .2s;-webkit-appearance:none;touch-action:manipulation;letter-spacing:-.01em}
+.savebtn.saved{background:var(--gn);color:#fff}
+.savebtn:active{transform:scale(.98)}
+.savenote{text-align:center;font-size:12px;color:var(--mu);margin-top:10px}
+.empty{text-align:center;padding:80px 20px;color:var(--mu)}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:16px;overflow:hidden;margin-bottom:12px}
+.chdr{padding:14px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:10px;user-select:none}
+.chdr:active{background:rgba(255,255,255,.02)}
+.badge{background:var(--ad);border:1px solid var(--ab);border-radius:8px;padding:4px 10px;font-family:monospace;font-size:13px;font-weight:700;color:var(--a);flex-shrink:0}
+.cmeta{flex:1;min-width:0}
+.ctitle{font-weight:700;font-size:15px;color:#e2e8f0;line-height:1.3}
+.csub{font-size:12px;color:var(--mu);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.carr{color:var(--mu);font-size:12px;flex-shrink:0;margin-top:3px}
+.cbody{border-top:1px solid var(--b1);padding:14px;display:none}
+.npre{background:rgba(0,0,0,.35);border:1px solid var(--b1);border-radius:10px;padding:13px;font-family:'Courier New',monospace;font-size:12px;color:#64748b;white-space:pre-wrap;line-height:1.8;margin-bottom:12px;word-break:break-word}
+.cacts{display:flex;gap:8px}
+.cpbtn{flex:1;background:var(--ad);border:1px solid var(--ab);border-radius:10px;color:var(--a);cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;padding:11px;transition:all .18s;-webkit-appearance:none;touch-action:manipulation}
+.cpbtn.done{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:var(--gn)}
+.delbtn{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;color:var(--rd);cursor:pointer;font-size:18px;padding:11px 14px;-webkit-appearance:none;touch-action:manipulation}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5)}50%{box-shadow:0 0 0 12px rgba(245,158,11,0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{width:16px;height:16px;border:2px solid rgba(0,0,0,.2);border-top-color:currentColor;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="ht">
+    <div class="brand"><sup>SalesField</sup><h1>Meeting Notes</h1></div>
+    <div class="hr">
+      <div class="chip" id="dateChip"></div>
+      <button class="ibtn" onclick="toggleSett()" title="Settings">⚙️</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" id="tn" onclick="goTab('new')">＋ New Note</button>
+    <button class="tab"    id="tl" onclick="goTab('log')">📋 Log (<span id="lc">0</span>)</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="sett" id="sett">
+    <h3>⚙️ AI Provider — Claude</h3>
+    <div class="field">
+      <label class="lbl">API Key</label>
+      <div class="krow">
+        <input type="password" id="apiKey" placeholder="sk-ant-…" oninput="saveKey()" autocomplete="off" spellcheck="false">
+        <button class="abtn" id="testBtn" onclick="testKey()" style="min-width:64px">Test</button>
+      </div>
+      <div class="hint">
+        Stored on this device only · <a href="https://console.anthropic.com" target="_blank">Get API key</a><br>
+        <strong style="color:var(--a)">Switching to Copilot later?</strong> Only the <code>PROVIDER</code> block in the JS needs changing — the rest of the app is untouched.
+      </div>
+    </div>
+  </div>
+
+  <div class="bnr" id="bnr"><span id="bnrTxt"></span></div>
+
+  <!-- NEW NOTE -->
+  <div id="vNew">
+
+    <div class="field">
+      <label class="lbl">Meeting Type</label>
+      <div class="pills">
+        <button class="pill on" id="pT1" onclick="setType('T1')">T1</button>
+        <button class="pill"    id="pT2" onclick="setType('T2')">T2</button>
+        <button class="pill"    id="pT3" onclick="setType('T3')">T3</button>
+      </div>
+      <div class="tl" id="tl2">T1 — Discovery Call</div>
+    </div>
+
+    <div class="field">
+      <label class="lbl">Topic / Keywords *</label>
+      <div class="mrow"><input type="text" id="f-kw" placeholder="e.g. oncology pipeline, Q3 budget, KOL engagement"><button class="mbtn" id="mb-kw" onclick="toggleMic('kw')">🎙</button></div>
+      <div class="rbar" id="rb-kw"><span class="dot"></span> Listening — tap ⏹ to stop</div>
+    </div>
+
+    <div class="cbox">
+      <div class="cbox-t">👤 Contact Info</div>
+      <div class="field">
+        <label class="lbl">Customer Name *</label>
+        <div class="mrow"><input type="text" id="f-cu" placeholder="Dr. Sarah Chen"><button class="mbtn" id="mb-cu" onclick="toggleMic('cu')">🎙</button></div>
+        <div class="rbar" id="rb-cu"><span class="dot"></span> Listening — tap ⏹ to stop</div>
+      </div>
+      <div class="field">
+        <label class="lbl">Email</label>
+        <div class="mrow"><input type="text" id="f-em" placeholder="sarah.chen@hospital.org"><button class="mbtn" id="mb-em" onclick="toggleMic('em')">🎙</button></div>
+        <div class="rbar" id="rb-em"><span class="dot"></span> Listening — tap ⏹ to stop</div>
+      </div>
+      <div class="field">
+        <label class="lbl">Account / Institution</label>
+        <div class="mrow"><input type="text" id="f-ac" placeholder="Memorial Cancer Center"><button class="mbtn" id="mb-ac" onclick="toggleMic('ac')">🎙</button></div>
+        <div class="rbar" id="rb-ac"><span class="dot"></span> Listening — tap ⏹ to stop</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="lbl">Key Points</label>
+      <div class="mrow"><textarea id="f-kp" rows="5" placeholder="Tap 🎙 and speak freely. AI corrects drug names, Phase 1/2/3, KOL, MSL, HCP, PK/PD, ORR, competitor names…"></textarea><button class="mbtn" id="mb-kp" onclick="toggleMic('kp')">🎙</button></div>
+      <div class="rbar" id="rb-kp"><span class="dot"></span> Listening — tap ⏹ to stop</div>
+    </div>
+
+    <div class="field">
+      <label class="lbl">Actionables</label>
+      <div class="mrow"><textarea id="f-act" rows="3" placeholder="e.g. send Phase 3 deck, schedule MSL visit, follow up on budget timeline…"></textarea><button class="mbtn" id="mb-act" onclick="toggleMic('act')">🎙</button></div>
+      <div class="rbar" id="rb-act"><span class="dot"></span> Listening — tap ⏹ to stop</div>
+    </div>
+
+    <div class="rfbar">
+      <span style="font-size:24px;flex-shrink:0">✨</span>
+      <p>Rough notes? <strong>Refine with AI</strong> to clean and structure everything for Salesforce.</p>
+      <button class="abtn" id="rfBtn" onclick="refine()">Refine</button>
+    </div>
+
+    <div class="rfbox" id="rfBox"><header>✅ AI-Refined — Ready to Copy</header><pre id="rfPre"></pre></div>
+
+    <button class="savebtn" id="saveBtn" onclick="saveNote()">💾 Save to Meeting Log</button>
+    <p class="savenote">* Topic and Customer Name required</p>
+  </div>
+
+  <!-- LOG -->
+  <div id="vLog" style="display:none"><div id="logList"></div></div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  ██████╗ ██████╗  ██████╗ ██╗   ██╗██╗██████╗ ███████╗██████╗
+//  ██╔══██╗██╔══██╗██╔═══██╗██║   ██║██║██╔══██╗██╔════╝██╔══██╗
+//  ██████╔╝██████╔╝██║   ██║██║   ██║██║██║  ██║█████╗  ██████╔╝
+//  ██╔═══╝ ██╔══██╗██║   ██║╚██╗ ██╔╝██║██║  ██║██╔══╝  ██╔══██╗
+//  ██║     ██║  ██║╚██████╔╝ ╚████╔╝ ██║██████╔╝███████╗██║  ██║
+//  ╚═╝     ╚═╝  ╚═╝ ╚═════╝   ╚═══╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝
+//
+//  AI PROVIDER MODULE — swap this block to change AI provider
+//  ─────────────────────────────────────────────────────────────────
+//  Current: Claude (Anthropic)
+//
+//  To switch to Microsoft Copilot / Azure OpenAI:
+//   1. Change `apiUrl` to your Azure endpoint
+//   2. Change `headers()` to use `{ 'api-key': key }` instead
+//   3. Change `buildBody()` to use `{ messages, max_tokens }` format
+//   4. Change `parseResponse()` to read `data.choices[0].message.content`
+//   Nothing else in the app needs to change.
+// ═══════════════════════════════════════════════════════════════════
+const PROVIDER = {
+  name: 'Claude',
+
+  apiUrl: 'https://api.anthropic.com/v1/messages',
+
+  headers(key) {
+    return {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    };
+  },
+
+  buildBody(system, user, maxTokens = 1000) {
+    return {
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      system,
+      messages: [{ role: 'user', content: user }],
+    };
+  },
+
+  parseResponse(data) {
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    return (data.content || []).map(b => b.text || '').join('').trim();
+  },
+
+  async call(system, user, maxTokens) {
+    const key = getKey();
+    if (!key) throw new Error('No API key — tap ⚙️ to add one.');
+    const res = await fetch(this.apiUrl, {
+      method: 'POST',
+      headers: this.headers(key),
+      body: JSON.stringify(this.buildBody(system, user, maxTokens)),
+    });
+    const data = await res.json();
+    return this.parseResponse(data);
+  },
+
+  async cleanTranscript(raw, hint) {
+    return this.call(
+      `You are a transcript corrector for a biotech/pharma field sales rep.
+Fix speech recognition errors. Context: ${hint}
+- Correct mishearing of drug names, medical abbreviations, proper nouns
+- Fix punctuation and capitalisation
+- Do NOT add information not in the transcript
+- Return ONLY the corrected text`,
+      raw, 400
+    );
+  },
+
+  async refineNotes(d) {
+    return this.call(
+      `You are a sales note formatter for a biotech/pharma rep.
+Return ONLY the formatted Salesforce log entry — no preamble.`,
+      `Format using EXACTLY this structure:
+
+${d.type}. [Concise 5-8 word professional title]
+
+📅 ${d.today}
+👤 ${d.cu || '[Name]'}${d.em ? ' | ' + d.em : ''}${d.ac ? ' | ' + d.ac : ''}
+
+📝 KEY POINTS
+• [bullet — clear, professional, biotech terms preserved]
+• [bullet]
+[3-6 bullets total]
+
+✅ ACTIONABLES
+→ [specific action item]
+→ [specific action item]
+[2-5 items]
+
+---
+RAW INPUT
+Type: ${d.type} (${d.typeLabel})
+Topic: ${d.kw || 'n/a'}
+Contact: ${d.cu || '?'} | ${d.em || '?'} | ${d.ac || '?'}
+Key points: ${d.kp || 'none'}
+Actionables: ${d.act || 'none'}`,
+      900
+    );
+  },
+};
+// ═══════════════════════════════════════════════════════════════════
+
+
+// ── FIELD HINTS (for transcript correction context) ───────────────
+const HINTS = {
+  kw:  'Short topic/keyword phrase for a biotech sales meeting. May include drug names, therapy areas, abbreviations.',
+  cu:  'A person\'s full name. May have a professional title like Dr., Prof., or MD.',
+  em:  'An email address spoken aloud. Format as name@domain.com.',
+  ac:  'Name of a hospital, clinic, cancer center, or pharmaceutical company.',
+  kp:  'Field sales notes from a biotech/pharma rep. Includes drug names, trial phases (Phase 1/2/3), abbreviations like KOL MSL KAM HCP SoC PK PD ORR OS PFS IV SC, competitor names.',
+  act: 'Follow-up action items from a biotech/pharma sales meeting.',
+};
+
+const TL = { T1:'T1 — Discovery Call', T2:'T2 — Follow-Up / Demo', T3:'T3 — Closing / Negotiation' };
+const MK = 'sf_v1', AK = 'sf_key';
+
+let meetings = [], curType = 'T1', refined = '', activeF = null, recog = null;
+
+// ── INIT ──────────────────────────────────────────────────────────
+document.getElementById('dateChip').textContent =
+  new Date().toLocaleDateString('en-US', { month:'short', day:'numeric' });
+try { meetings = JSON.parse(localStorage.getItem(MK) || '[]'); } catch(e) {}
+document.getElementById('apiKey').value = localStorage.getItem(AK) || '';
+document.getElementById('lc').textContent = meetings.length;
+
+// ── UTILS ─────────────────────────────────────────────────────────
+const getKey  = () => localStorage.getItem(AK) || '';
+const persist = () => localStorage.setItem(MK, JSON.stringify(meetings));
+const fv      = id  => document.getElementById('f-' + id).value.trim();
+const fset    = (id, v) => { document.getElementById('f-' + id).value = v; };
+const fadd    = (id, v) => {
+  const el = document.getElementById('f-' + id);
+  el.value = el.value ? el.value.trimEnd() + ' ' + v : v;
+};
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const now = () => new Date().toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+
+// ── BANNER ────────────────────────────────────────────────────────
+let bTimer;
+function banner(msg, type='info', ms=4000) {
+  const el = document.getElementById('bnr');
+  document.getElementById('bnrTxt').textContent = msg;
+  el.className = 'bnr show ' + type;
+  if (bTimer) clearTimeout(bTimer);
+  if (ms) bTimer = setTimeout(() => el.classList.remove('show'), ms);
+}
+function hideBnr() { document.getElementById('bnr').classList.remove('show'); }
+
+// ── SETTINGS ──────────────────────────────────────────────────────
+function toggleSett() { document.getElementById('sett').classList.toggle('open'); }
+function saveKey() { localStorage.setItem(AK, document.getElementById('apiKey').value.trim()); }
+async function testKey() {
+  if (!getKey()) { banner('Enter an API key first.', 'warn'); return; }
+  const b = document.getElementById('testBtn');
+  b.innerHTML = '<span class="spin"></span>'; b.disabled = true;
+  try {
+    await PROVIDER.call('You are a test assistant.', 'Reply with exactly the word: OK', 10);
+    b.textContent = '✓ OK'; b.style.cssText = 'background:var(--gn);color:#fff';
+    banner('✓ API key is working!', 'ok');
+  } catch(e) {
+    b.textContent = '✗ Fail'; b.style.cssText = 'background:var(--rd);color:#fff';
+    banner('Failed: ' + e.message, 'err', 8000);
+  }
+  setTimeout(() => { b.textContent = 'Test'; b.style.cssText = ''; b.disabled = false; }, 3500);
+}
+
+// ── NAV ───────────────────────────────────────────────────────────
+function goTab(t) {
+  document.getElementById('vNew').style.display  = t==='new' ? '' : 'none';
+  document.getElementById('vLog').style.display  = t==='log' ? '' : 'none';
+  document.getElementById('tn').classList.toggle('on', t==='new');
+  document.getElementById('tl').classList.toggle('on', t==='log');
+  if (t==='log') renderLog();
+}
+function setType(c) {
+  ['T1','T2','T3'].forEach(x => document.getElementById('p'+x).classList.toggle('on', x===c));
+  curType = c;
+  document.getElementById('tl2').textContent = TL[c];
+}
+
+// ── MIC STATE ─────────────────────────────────────────────────────
+function micState(f, s) {
+  const b = document.getElementById('mb-' + f);
+  const r = document.getElementById('rb-' + f);
+  b.classList.remove('rec','busy');
+  if (s==='rec')  { b.classList.add('rec');  b.textContent='⏹'; r.classList.add('show'); }
+  if (s==='busy') { b.classList.add('busy'); b.innerHTML='<span class="spin"></span>'; r.classList.remove('show'); }
+  if (s==='idle') { b.textContent='🎙'; r.classList.remove('show'); }
+}
+function resetMics() {
+  ['kw','cu','em','ac','kp','act'].forEach(f => micState(f,'idle'));
+  activeF = null;
+}
+
+// ── VOICE ─────────────────────────────────────────────────────────
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function toggleMic(f) {
+  if (activeF === f) { stopMic(); return; }
+  if (activeF) stopMic();
+  startMic(f);
+}
+function stopMic() { try { if (recog) recog.stop(); } catch(e) {} }
+
+function startMic(f) {
+  if (!SR) { banner('Speech recognition not supported — use Chrome on Android.', 'err'); return; }
+  activeF = f;
+  recog = new SR();
+  recog.continuous = true;
+  recog.interimResults = true;
+  recog.lang = 'en-US';
+
+  let final = '';
+
+  recog.onstart = () => {
+    micState(f, 'rec');
+    banner('🎙 Listening… speak, then tap ⏹ to finish', 'info', 0);
+  };
+
+  recog.onresult = e => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) final += t + ' ';
+      else interim = t;
+    }
+    // Show live preview in placeholder
+    if (interim) document.getElementById('f-'+f).placeholder = '…' + interim;
+  };
+
+  recog.onerror = e => {
+    if (e.error === 'not-allowed')
+      banner('Mic blocked — tap 🔒 in address bar → allow microphone, then reload.', 'err', 10000);
+    else if (e.error !== 'no-speech')
+      banner('Mic error: ' + e.error, 'err');
+    resetMics();
+  };
+
+  recog.onend = async () => {
+    hideBnr();
+    document.getElementById('f-'+f).placeholder = '';
+    if (!final.trim()) { banner('No speech detected — try again.', 'warn'); resetMics(); return; }
+
+    micState(f, 'busy');
+    banner('⏳ Correcting with ' + PROVIDER.name + '…', 'info', 0);
+
+    try {
+      const clean = await PROVIDER.cleanTranscript(final.trim(), HINTS[f]);
+      fadd(f, clean);
+      banner('✓ Done — transcript corrected', 'ok');
+    } catch(e) {
+      fadd(f, final.trim()); // fallback: use raw
+      banner('⚠ Used raw transcript (' + e.message + ')', 'warn', 6000);
+    }
+    resetMics();
+  };
+
+  try { recog.start(); }
+  catch(e) { banner('Cannot start mic: ' + e.message, 'err'); resetMics(); }
+}
+
+// ── REFINE ────────────────────────────────────────────────────────
+async function refine() {
+  if (!fv('kp') && !fv('act')) { banner('Add some notes first.', 'warn'); return; }
+  const btn = document.getElementById('rfBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Working…';
+  try {
+    refined = await PROVIDER.refineNotes({
+      type: curType, typeLabel: TL[curType], today: now(),
+      kw: fv('kw'), cu: fv('cu'), em: fv('em'), ac: fv('ac'),
+      kp: fv('kp'), act: fv('act'),
+    });
+    document.getElementById('rfPre').textContent = refined;
+    const box = document.getElementById('rfBox');
+    box.style.display = '';
+    box.scrollIntoView({ behavior:'smooth', block:'start' });
+    banner('✓ Notes refined!', 'ok');
+  } catch(e) { banner('Refinement failed: ' + e.message, 'err', 7000); }
+  btn.disabled = false; btn.textContent = 'Refine';
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────
+function saveNote() {
+  const kw = fv('kw'), cu = fv('cu');
+  if (!kw || !cu) { banner('Topic and Customer Name are required.', 'warn'); return; }
+  const d = now(), em = fv('em'), ac = fv('ac'), kp = fv('kp'), act = fv('act');
+  const note = refined || [
+    curType + '. ' + kw, '',
+    '📅 ' + d,
+    '👤 ' + cu + (em?' | '+em:'') + (ac?' | '+ac:''), '',
+    '📝 KEY POINTS', kp||'—', '',
+    '✅ ACTIONABLES', act||'—',
+  ].join('\n');
+  meetings.unshift({ id:Date.now(), date:d, type:curType, kw, cu, em, ac, note });
+  persist();
+  document.getElementById('lc').textContent = meetings.length;
+  const b = document.getElementById('saveBtn');
+  b.textContent = '✓ Saved!'; b.classList.add('saved');
+  setTimeout(() => { b.textContent = '💾 Save to Meeting Log'; b.classList.remove('saved'); }, 2200);
+  ['kw','cu','em','ac','kp','act'].forEach(id => fset(id,''));
+  refined = '';
+  document.getElementById('rfBox').style.display = 'none';
+  setType('T1');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ── LOG ───────────────────────────────────────────────────────────
+function renderLog() {
+  const el = document.getElementById('logList');
+  if (!meetings.length) {
+    el.innerHTML = `<div class="empty"><div style="font-size:48px;margin-bottom:14px">📋</div><div style="font-weight:700">No meetings yet</div></div>`;
+    return;
+  }
+  el.innerHTML = meetings.map(m => `
+    <div class="card">
+      <div class="chdr" onclick="toggleCard(this)">
+        <div class="badge">${m.type}</div>
+        <div class="cmeta">
+          <div class="ctitle">${esc(m.kw)}</div>
+          <div class="csub">${esc(m.cu)}${m.ac?' · '+esc(m.ac):''} · ${esc(m.date)}</div>
+        </div>
+        <div class="carr">▼</div>
+      </div>
+      <div class="cbody">
+        <div class="npre">${esc(m.note)}</div>
+        <div class="cacts">
+          <button class="cpbtn" onclick="copyNote(this,'${m.id}')">📋 Copy for Salesforce</button>
+          <button class="delbtn" onclick="delNote('${m.id}')">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleCard(hdr) {
+  const body = hdr.nextElementSibling;
+  const arr  = hdr.querySelector('.carr');
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  arr.textContent    = open ? '▼' : '▲';
+}
+function copyNote(btn, id) {
+  const m = meetings.find(x => String(x.id) === id); if (!m) return;
+  navigator.clipboard.writeText(m.note).then(() => {
+    btn.textContent = '✓ Copied!'; btn.classList.add('done');
+    setTimeout(() => { btn.textContent = '📋 Copy for Salesforce'; btn.classList.remove('done'); }, 2000);
+  });
+}
+function delNote(id) {
+  if (!confirm('Delete this note?')) return;
+  meetings = meetings.filter(m => String(m.id) !== id);
+  persist(); document.getElementById('lc').textContent = meetings.length; renderLog();
+}
+</script>
+</body>
+</html>
