@@ -405,63 +405,90 @@ function toggleMic(f) {
   if (activeF) stopMic();
   startMic(f);
 }
-function stopMic() { try { if (recog) recog.stop(); } catch(e) {} }
+// Chunk-restart approach: avoids Android Chrome's continuous-mode
+// duplication bug where interim results get re-appended as finals.
+// Instead of continuous=true, we restart recognition after each
+// natural pause, accumulating clean final chunks ourselves.
+
+let shouldRestart = false;
+let accumulated   = '';   // clean final text across all chunks
+let activeFieldRef = null;
+
+function stopMic() {
+  shouldRestart = false;
+  try { if (recog) recog.stop(); } catch(e) {}
+}
 
 function startMic(f) {
   if (!SR) { banner('Speech recognition not supported — use Chrome on Android.', 'err'); return; }
   activeF = f;
+  activeFieldRef = f;
+  shouldRestart  = true;
+  accumulated    = '';
+  micState(f, 'rec');
+  banner('🎙 Listening… speak, then tap ⏹ to finish', 'info', 0);
+  runChunk(f);
+}
+
+function runChunk(f) {
+  if (!shouldRestart || activeFieldRef !== f) return;
+
   recog = new SR();
-  recog.continuous = true;
+  recog.continuous     = false;   // ← key fix: one chunk at a time
   recog.interimResults = true;
-  recog.lang = 'en-US';
+  recog.lang           = 'en-US';
 
-  let final = '';
-
-  recog.onstart = () => {
-    micState(f, 'rec');
-    banner('🎙 Listening… speak, then tap ⏹ to finish', 'info', 0);
-  };
+  let chunkFinal = '';
 
   recog.onresult = e => {
     let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) final += t + ' ';
-      else interim = t;
+    for (let i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) chunkFinal = e.results[i][0].transcript;
+      else interim = e.results[i][0].transcript;
     }
-    // Show live preview in placeholder
-    if (interim) document.getElementById('f-'+f).placeholder = '…' + interim;
+    // Live preview in placeholder
+    const preview = (accumulated + ' ' + chunkFinal + ' ' + interim).trim();
+    if (preview) document.getElementById('f-'+f).placeholder = preview;
   };
 
   recog.onerror = e => {
-    if (e.error === 'not-allowed')
+    if (e.error === 'not-allowed') {
       banner('Mic blocked — tap 🔒 in address bar → allow microphone, then reload.', 'err', 10000);
-    else if (e.error !== 'no-speech')
-      banner('Mic error: ' + e.error, 'err');
-    resetMics();
+      shouldRestart = false; resetMics();
+    }
+    // 'no-speech' is normal — just restart the chunk silently
   };
 
   recog.onend = async () => {
-    hideBnr();
-    document.getElementById('f-'+f).placeholder = '';
-    if (!final.trim()) { banner('No speech detected — try again.', 'warn'); resetMics(); return; }
+    // Add this chunk's final text to accumulator
+    if (chunkFinal.trim()) accumulated += (accumulated ? ' ' : '') + chunkFinal.trim();
 
-    micState(f, 'busy');
-    banner('⏳ Correcting with ' + PROVIDER.name + '…', 'info', 0);
+    if (shouldRestart) {
+      // Keep listening — start next chunk
+      setTimeout(() => runChunk(f), 80);
+    } else {
+      // User tapped stop — process everything
+      hideBnr();
+      document.getElementById('f-'+f).placeholder = '';
+      const full = accumulated.trim();
+      if (!full) { banner('No speech detected — try again.', 'warn'); resetMics(); return; }
 
-    try {
-      const clean = await PROVIDER.cleanTranscript(final.trim(), HINTS[f]);
-      fadd(f, clean);
-      banner('✓ Done — transcript corrected', 'ok');
-    } catch(e) {
-      fadd(f, final.trim()); // fallback: use raw
-      banner('⚠ Used raw transcript (' + e.message + ')', 'warn', 6000);
+      micState(f, 'busy');
+      banner('⏳ Correcting with ' + PROVIDER.name + '…', 'info', 0);
+      try {
+        const clean = await PROVIDER.cleanTranscript(full, HINTS[f]);
+        fadd(f, clean);
+        banner('✓ Done — transcript corrected', 'ok');
+      } catch(e) {
+        fadd(f, full);
+        banner('⚠ Used raw transcript (' + e.message + ')', 'warn', 6000);
+      }
+      accumulated = '';
+      resetMics();
     }
-    resetMics();
   };
 
-  try { recog.start(); }
-  catch(e) { banner('Cannot start mic: ' + e.message, 'err'); resetMics(); }
+  try { recog.start(); } catch(e) { /* ignore restart race conditions */ }
 }
 
 // ── REFINE ────────────────────────────────────────────────────────
